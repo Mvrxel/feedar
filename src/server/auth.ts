@@ -6,6 +6,8 @@ import {
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import DiscordProvider from "next-auth/providers/discord";
+import EmailProvider from "next-auth/providers/email";
+import nodemailer from "nodemailer";
 
 import { env } from "@/env";
 import { db } from "@/server/db";
@@ -46,12 +48,29 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   },
+  pages: {
+    signIn: "/auth/login",
+    verifyRequest: "/auth/login?callbackUrl=/auth/verify",
+  },
   adapter: PrismaAdapter(db) as Adapter,
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: process.env.EMAIL_SERVER_PORT
+          ? parseInt(process.env.EMAIL_SERVER_PORT)
+          : 465,
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM,
     }),
+    // DiscordProvider({
+    //   clientId: env.DISCORD_CLIENT_ID,
+    //   clientSecret: env.DISCORD_CLIENT_SECRET,
+    // }),
     /**
      * ...add more providers here.
      *

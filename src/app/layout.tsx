@@ -4,6 +4,8 @@ import { type Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/react";
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import { ProtectedProvider } from "@/components/ui/protected";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -27,7 +29,16 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ProtectedProvider>{children}</ProtectedProvider>
+          </ThemeProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   );
