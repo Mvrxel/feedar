@@ -109,3 +109,68 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+enum TopicType {
+  BASIC
+  COMPETITOR
+}
+
+model Topic {
+  id String @id @default(cuid())
+  name String
+  type TopicType
+  topicBasic TopicBasic?
+  topicCompetitor TopicCompetitor?
+  includeDomains IncludeDomain[]
+  excludeDomains ExcludeDomain[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model IncludeDomain {
+  id String @id @default(cuid())
+  topic Topic @relation(fields: [topicId], references: [id])
+  topicId String @unique
+  domain String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExcludeDomain {
+  id String @id @default(cuid())
+  topic Topic @relation(fields: [topicId], references: [id])
+  topicId String @unique
+  domain String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TopicBasic {
+  id String @id @default(cuid())
+  topic Topic @relation(fields: [topicId], references: [id])
+  topicId String @unique
+  context String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TopicCompetitor {
+  id String @id @default(cuid())
+  topic Topic @relation(fields: [topicId], references: [id])
+  topicId String @unique
+  companies Company[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Company {
+  id String @id @default(cuid())
+  topicCompetitor TopicCompetitor @relation(fields: [topicCompetitorId], references: [id])
+  topicCompetitorId String
+  name String
+  domain String?
+  description String?
+  logoUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
