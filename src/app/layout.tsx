@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { ProtectedProvider } from "@/components/ui/protected";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ProtectedProvider>{children}</ProtectedProvider>
+            <Toaster />
           </ThemeProvider>
         </TRPCReactProvider>
       </body>

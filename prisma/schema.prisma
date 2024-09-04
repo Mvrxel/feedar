@@ -2,58 +2,57 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+  // Further reading:
+  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+  url      = env("DATABASE_URL")
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
 
-    @@index([name])
+  @@index([name])
 }
 
 // Necessary for Next auth
 model Account {
-    id                       String  @id @default(cuid())
-    userId                   String
-    type                     String
-    provider                 String
-    providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
-    expires_at               Int?
-    token_type               String?
-    scope                    String?
-    id_token                 String? // @db.Text
-    session_state            String?
-    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-    refresh_token_expires_in Int?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? // @db.Text
+  access_token             String? // @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? // @db.Text
+  session_state            String?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token_expires_in Int?
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
 
 enum Plan {
   TRIAL
@@ -67,12 +66,13 @@ enum MembershipRole {
 }
 
 model Workspace {
-  id                    String                  @id @default(cuid())
-  name                  String
-  isFreeTrial           Boolean                 @default(true)
-  plan                  Plan                    @default(TRIAL)
-  freeTrialEndsAt       DateTime?               @default(now())
-  membership            Membership[]
+  id              String       @id @default(cuid())
+  name            String
+  isFreeTrial     Boolean      @default(true)
+  plan            Plan         @default(TRIAL)
+  freeTrialEndsAt DateTime?    @default(now())
+  membership      Membership[]
+  Topic           Topic[]
 }
 
 model Membership {
@@ -91,23 +91,23 @@ model Membership {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
-    membership    Membership[]
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?      @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  membership    Membership[]
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }
 
 enum TopicType {
@@ -116,61 +116,63 @@ enum TopicType {
 }
 
 model Topic {
-  id String @id @default(cuid())
-  name String
-  type TopicType
-  topicBasic TopicBasic?
+  id              String           @id @default(cuid())
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id])
+  workspaceId     String
+  name            String
+  type            TopicType
+  topicBasic      TopicBasic?
   topicCompetitor TopicCompetitor?
-  includeDomains IncludeDomain[]
-  excludeDomains ExcludeDomain[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  includeDomains  IncludeDomain[]
+  excludeDomains  ExcludeDomain[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model IncludeDomain {
-  id String @id @default(cuid())
-  topic Topic @relation(fields: [topicId], references: [id])
-  topicId String @unique
-  domain String
+  id        String   @id @default(cuid())
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  topicId   String   @unique
+  domain    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ExcludeDomain {
-  id String @id @default(cuid())
-  topic Topic @relation(fields: [topicId], references: [id])
-  topicId String @unique
-  domain String
+  id        String   @id @default(cuid())
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  topicId   String   @unique
+  domain    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model TopicBasic {
-  id String @id @default(cuid())
-  topic Topic @relation(fields: [topicId], references: [id])
-  topicId String @unique
-  context String
+  id        String   @id @default(cuid())
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  topicId   String   @unique
+  context   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model TopicCompetitor {
-  id String @id @default(cuid())
-  topic Topic @relation(fields: [topicId], references: [id])
-  topicId String @unique
+  id        String    @id @default(cuid())
+  topic     Topic     @relation(fields: [topicId], references: [id])
+  topicId   String    @unique
   companies Company[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Company {
-  id String @id @default(cuid())
-  topicCompetitor TopicCompetitor @relation(fields: [topicCompetitorId], references: [id])
+  id                String          @id @default(cuid())
+  topicCompetitor   TopicCompetitor @relation(fields: [topicCompetitorId], references: [id])
   topicCompetitorId String
-  name String
-  domain String?
-  description String?
-  logoUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name              String
+  domain            String?
+  description       String?
+  logoUrl           String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }

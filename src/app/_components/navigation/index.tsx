@@ -11,7 +11,6 @@ import {
 import { useTheme } from "next-themes";
 import { Moon, Sun, ChevronDown } from "lucide-react";
 import { ProfileInformation } from "../profile-information";
-import { Suspense } from "react";
 import { signOut } from "next-auth/react";
 
 export function Navigation() {
@@ -21,17 +20,14 @@ export function Navigation() {
     setTheme(theme === "light" ? "dark" : "light");
   }
   return (
-    <div className="flex justify-between border-b py-8">
+    <div className="flex items-center justify-between border-b py-8">
       <div className="text-2xl font-bold">Feedar</div>
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
           <Avatar className="h-12 w-12">
-            <AvatarImage src="/placeholder-avatar.jpg" alt="User" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfileInformation />
-          </Suspense>
+          <ProfileInformation />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center space-x-2">

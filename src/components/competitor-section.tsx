@@ -106,7 +106,7 @@ export function CompetitorSection({
             <TableHead>Name</TableHead>
             <TableHead>Website</TableHead>
             <TableHead>Description</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead className="text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -116,7 +116,7 @@ export function CompetitorSection({
               <TableCell>{competitor.website}</TableCell>
               <TableCell>{competitor.description}</TableCell>
               <TableCell>
-                <div className="flex space-x-2">
+                <div className="flex items-end justify-end space-x-2">
                   <Button
                     type="button"
                     size="icon"

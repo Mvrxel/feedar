@@ -19,6 +19,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { BookOpenIcon, TrophyIcon } from "lucide-react";
 import { CompetitorSection } from "./competitor-section";
 import { DomainSection } from "./domain-section";
+import { toast } from "sonner";
+import { api } from "@/trpc/react";
 
 // Update the formSchema to include domains
 const formSchema = z.object({
@@ -32,7 +34,43 @@ const formSchema = z.object({
   includeDomains: z.array(z.string()),
   excludeDomains: z.array(z.string()),
 });
+const basicTopicSchema = z.object({
+  name: z.string(),
+  context: z.string().optional(),
+  type: z.enum(["BASIC", "COMPETITOR"]),
+  includedDomains: z.array(
+    z.object({
+      name: z.string(),
+    }),
+  ),
+  excludedDomains: z.array(
+    z.object({
+      name: z.string(),
+    }),
+  ),
+});
 
+const competitorTopicSchema = z.object({
+  name: z.string(),
+  competitors: z.array(
+    z.object({
+      name: z.string(),
+      url: z.string().optional(),
+      description: z.string().optional(),
+    }),
+  ),
+  type: z.enum(["BASIC", "COMPETITOR"]),
+  includedDomains: z.array(
+    z.object({
+      name: z.string(),
+    }),
+  ),
+  excludedDomains: z.array(
+    z.object({
+      name: z.string(),
+    }),
+  ),
+});
 export type Competitor = {
   id: number;
   name: string;
@@ -56,32 +94,65 @@ export function CreateTopic() {
       excludeDomains: [],
     },
   });
-
+  const utils = api.useUtils();
+  const createBasicTopic = api.topic.createBasicTopic.useMutation({
+    onSuccess: async () => {
+      await utils.topic.invalidate();
+    },
+  });
+  const createCompetitorTopic = api.topic.createCompetitorTopic.useMutation({
+    onSuccess: async () => {
+      await utils.topic.invalidate();
+    },
+  });
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      const commonData = {
-        topicName: values.topicName,
-        topicType: values.topicType,
-        includeDomains,
-        excludeDomains,
-      };
+    const commonData = {
+      topicName: values.topicName,
+      topicType: values.topicType,
+      includeDomains,
+      excludeDomains,
+    };
+    if (values.topicType === "basic") {
+      const basicValues = {
+        name: values.topicName,
+        context: values.context ?? "",
+        type: "BASIC",
+        excludedDomains: excludeDomains.map((name) => ({ name: name })),
+        includedDomains: includeDomains.map((name) => ({ name: name })),
+      } as z.infer<typeof basicTopicSchema>;
+      if (basicValues.context) {
+        if (basicValues.context !== undefined) {
+          console.log(basicValues);
+          createBasicTopic.mutate(basicValues);
+          setIsSubmitting(false);
+        }
+      } else {
+        toast.error("Please enter a context");
 
-      if (values.topicType === "basic") {
-        console.log({
-          ...commonData,
-          context: values.context,
-        });
-      } else if (values.topicType === "competitor") {
-        console.log({
-          ...commonData,
-          competitors,
-        });
+        setIsSubmitting(false);
       }
-
-      setIsSubmitting(false);
-    }, 2000);
+    } else if (values.topicType === "competitor") {
+      if (competitors.length > 0) {
+        const competitorValues = {
+          name: values.topicName,
+          competitors: competitors.map((competitor) => ({
+            name: competitor.name,
+            url: competitor.website,
+            description: competitor.description,
+          })),
+          type: "COMPETITOR",
+          includedDomains: includeDomains.map((name) => ({ name })),
+          excludedDomains: excludeDomains.map((name) => ({ name })),
+        } as z.infer<typeof competitorTopicSchema>;
+        console.log(competitorValues);
+        createCompetitorTopic.mutate(competitorValues);
+        setIsSubmitting(false);
+      } else {
+        toast.error("Please enter at least one competitor");
+        setIsSubmitting(false);
+      }
+    }
   }
 
   return (
