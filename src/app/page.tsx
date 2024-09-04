@@ -1,10 +1,9 @@
-import { UserInformation } from "./_components/user-information";
+import { Navigation } from "./_components/navigation";
 
-export default async function Home() {
+export default function Home() {
   return (
-    <div>
-      <h1>Hello World</h1>
-      <UserInformation />
+    <div className="container">
+      <Navigation />
     </div>
   );
 }
