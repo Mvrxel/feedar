@@ -13,7 +13,7 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "Zenner",
+  title: "Feedar",
   description: "Zenner is an ai platform for scanning invoices and receipts",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
@@ -32,7 +32,7 @@ export default function RootLayout({
         <TRPCReactProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >

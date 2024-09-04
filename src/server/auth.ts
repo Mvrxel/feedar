@@ -11,6 +11,7 @@ import nodemailer from "nodemailer";
 
 import { env } from "@/env";
 import { db } from "@/server/db";
+import { Membership, Workspace } from "@prisma/client";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -18,19 +19,28 @@ import { db } from "@/server/db";
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
+
+export interface Member extends Membership {
+  workspace: Workspace;
+}
+
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      name: string;
+      email: string;
+      memberships: Member[];
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    name: string;
+    email: string;
+    role?: string;
+    description?: string;
+    memberships?: Member[];
+  }
 }
 
 /**
@@ -40,13 +50,27 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, user }) => {
+      const memberships = await db.user.findFirst({
+        where: {
+          id: user.id,
+        },
+        select: {
+          membership: {
+            select: {
+              id: true,
+              role: true,
+              workspace: true,
+              workspaceId: true,
+            },
+          },
+        },
+      });
+      session.user.id = user.id;
+      session.user.name = user.name;
+      session.user.memberships = memberships?.membership as Member[];
+      return session;
+    },
   },
   pages: {
     signIn: "/auth/login",

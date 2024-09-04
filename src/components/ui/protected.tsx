@@ -22,11 +22,25 @@ export async function ProtectedProvider({
   children: React.ReactNode;
 }) {
   const session = await getServerAuthSession();
+  const member = session?.user.memberships;
+  console.log(member?.length);
   const header = headers().get("x-next-pathname");
 
   // Redirect to login page when session is not available
   if (!session && header && !isPublicRoute(header)) {
     redirect("/auth/login");
+  }
+
+  if (session && header && header !== "/onboard" && member?.length === 0) {
+    redirect("/onboard");
+  }
+
+  if (session && header && header === "/onboard" && member?.length !== 0) {
+    redirect("/");
+  }
+
+  if (session && header && isPublicRoute(header)) {
+    redirect("/");
   }
 
   return <div>{children}</div>;

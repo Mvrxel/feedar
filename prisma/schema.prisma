@@ -54,6 +54,42 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+
+enum Plan {
+  TRIAL
+  BASIC
+  PRO
+}
+
+enum MembershipRole {
+  OWNER
+  MEMBER
+}
+
+model Workspace {
+  id                    String                  @id @default(cuid())
+  name                  String
+  isFreeTrial           Boolean                 @default(true)
+  plan                  Plan                    @default(TRIAL)
+  freeTrialEndsAt       DateTime?               @default(now())
+  membership            Membership[]
+}
+
+model Membership {
+  id           String         @id @default(cuid())
+  role         MembershipRole
+  workspace    Workspace      @relation(fields: [workspaceId], references: [id])
+  workspaceId  String
+  user         User?          @relation(fields: [userId], references: [id])
+  userId       String?
+  invitedName  String?
+  invitedEmail String?
+  invitedToken String?
+  isActive     Boolean        @default(true)
+
+  @@unique([workspaceId, invitedEmail])
+}
+
 model User {
     id            String    @id @default(cuid())
     name          String?
@@ -63,6 +99,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    membership    Membership[]
 }
 
 model VerificationToken {
