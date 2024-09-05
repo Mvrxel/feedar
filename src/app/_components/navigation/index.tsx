@@ -12,6 +12,7 @@ import { useTheme } from "next-themes";
 import { Moon, Sun, ChevronDown } from "lucide-react";
 import { ProfileInformation } from "../profile-information";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 
 export function Navigation() {
   const { theme, setTheme } = useTheme();
@@ -19,18 +20,41 @@ export function Navigation() {
   function toggleTheme() {
     setTheme(theme === "light" ? "dark" : "light");
   }
+  function onSignOut() {
+    try {
+      signOut()
+        .then(() => {
+          console.log("Signed out");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return (
-    <div className="flex items-center justify-between border-b py-8">
-      <div className="text-2xl font-bold">Feedar</div>
+    <div className="flex items-center justify-between border-b py-4">
+      <div className="pt-4">
+        {theme === "light" ? (
+          <Image src="/logo-light.png" alt="logo" width={120} height={200} />
+        ) : (
+          <Image src="/logo-dark.png" alt="logo" width={120} height={200} />
+        )}
+      </div>
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
-          <Avatar className="h-12 w-12">
+          <Avatar className="h-10 w-10">
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
           <ProfileInformation />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="flex items-center space-x-2"
+              >
                 <ChevronDown className="h-4 w-4 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
@@ -38,13 +62,7 @@ export function Navigation() {
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  signOut();
-                }}
-              >
-                Sign out
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

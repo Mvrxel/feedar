@@ -7,7 +7,7 @@ import { Plus } from "lucide-react";
 export function NoTopics() {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="flex h-full w-full items-center justify-center py-10">
+    <div className="my-4 flex h-full w-full items-center justify-center rounded-md border bg-white py-10 shadow-sm dark:bg-zinc-900">
       {!isOpen ? (
         <div>
           <h1 className="mb-4 text-center text-2xl font-bold">No topics</h1>
@@ -17,7 +17,7 @@ export function NoTopics() {
           </Button>
         </div>
       ) : (
-        <CreateTopic />
+        <CreateTopic onSuccess={() => setIsOpen(false)} />
       )}
     </div>
   );

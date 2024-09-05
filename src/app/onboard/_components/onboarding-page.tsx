@@ -61,7 +61,7 @@ export function OnboardingCard() {
         <CardHeader>
           <CardTitle>Welcome aboard!</CardTitle>
           <CardDescription>
-            Let's get you set up with your new account.
+            Let&apos;s get you set up with your new account.
           </CardDescription>
         </CardHeader>
         <CardContent>

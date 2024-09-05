@@ -62,13 +62,35 @@ export const topicRouter = createTRPCRouter({
       if (!workspace) {
         throw new Error("No workspace found");
       }
-      return ctx.db.topic.create({
+      if (!input.context) {
+        throw new Error("Context is required");
+      }
+      const topic = await ctx.db.topic.create({
         data: {
-          ...input,
+          name: input.name,
           workspace: { connect: { id: workspace.id } },
           type: "BASIC",
         },
       });
+      await ctx.db.topicBasic.create({
+        data: {
+          topic: { connect: { id: topic.id } },
+          context: input.context,
+        },
+      });
+      await ctx.db.includeDomain.createMany({
+        data: input.includedDomains.map((domain) => ({
+          topicId: topic.id,
+          domain: domain.name,
+        })),
+      });
+      await ctx.db.excludeDomain.createMany({
+        data: input.excludedDomains.map((domain) => ({
+          topicId: topic.id,
+          domain: domain.name,
+        })),
+      });
+      return topic;
     }),
   createCompetitorTopic: protectedProcedure
     .input(competitorTopicSchema)
@@ -79,12 +101,40 @@ export const topicRouter = createTRPCRouter({
       if (!workspace) {
         throw new Error("No workspace found");
       }
-      return ctx.db.topic.create({
+      const topic = await ctx.db.topic.create({
         data: {
-          ...input,
+          name: input.name,
           workspace: { connect: { id: workspace.id } },
           type: "COMPETITOR",
         },
       });
+      const topicCompetitor = await ctx.db.topicCompetitor.create({
+        data: {
+          topic: { connect: { id: topic.id } },
+        },
+      });
+      for (const competitor of input.competitors) {
+        await ctx.db.company.create({
+          data: {
+            topicCompetitor: { connect: { id: topicCompetitor.id } },
+            name: competitor.name,
+            domain: competitor.url,
+            description: competitor.description,
+          },
+        });
+      }
+      await ctx.db.includeDomain.createMany({
+        data: input.includedDomains.map((domain) => ({
+          topicId: topic.id,
+          domain: domain.name,
+        })),
+      });
+      await ctx.db.excludeDomain.createMany({
+        data: input.excludedDomains.map((domain) => ({
+          topicId: topic.id,
+          domain: domain.name,
+        })),
+      });
+      return topic;
     }),
 });

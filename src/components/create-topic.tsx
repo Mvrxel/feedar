@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Control } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -78,7 +78,11 @@ export type Competitor = {
   description: string;
 };
 
-export function CreateTopic() {
+interface CreateTopicProps {
+  onSuccess: () => void;
+}
+
+export function CreateTopic({ onSuccess }: CreateTopicProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [includeDomains, setIncludeDomains] = useState<string[]>([]);
@@ -126,6 +130,7 @@ export function CreateTopic() {
           console.log(basicValues);
           createBasicTopic.mutate(basicValues);
           setIsSubmitting(false);
+          onSuccess();
         }
       } else {
         toast.error("Please enter a context");
@@ -148,6 +153,7 @@ export function CreateTopic() {
         console.log(competitorValues);
         createCompetitorTopic.mutate(competitorValues);
         setIsSubmitting(false);
+        onSuccess();
       } else {
         toast.error("Please enter at least one competitor");
         setIsSubmitting(false);
@@ -187,7 +193,11 @@ export function CreateTopic() {
   );
 }
 
-function TopicNameField({ control }: { control: any }) {
+function TopicNameField({
+  control,
+}: {
+  control: Control<z.infer<typeof formSchema>>;
+}) {
   return (
     <FormField
       control={control}
@@ -205,7 +215,11 @@ function TopicNameField({ control }: { control: any }) {
   );
 }
 
-function TopicTypeField({ control }: { control: any }) {
+function TopicTypeField({
+  control,
+}: {
+  control: Control<z.infer<typeof formSchema>>;
+}) {
   return (
     <FormField
       control={control}
@@ -270,7 +284,11 @@ function TopicTypeOption({
   );
 }
 
-function ContextField({ control }: { control: any }) {
+function ContextField({
+  control,
+}: {
+  control: Control<z.infer<typeof formSchema>>;
+}) {
   return (
     <FormField
       control={control}

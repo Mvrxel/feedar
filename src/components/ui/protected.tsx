@@ -36,11 +36,14 @@ export async function ProtectedProvider({
   }
 
   if (session && header && header === "/onboard" && member?.length !== 0) {
-    redirect("/");
+    redirect("/feed");
+  }
+  if (session && header && header === "/" && member?.length !== 0) {
+    redirect("/feed");
   }
 
   if (session && header && isPublicRoute(header)) {
-    redirect("/");
+    redirect("/feed");
   }
 
   return <div>{children}</div>;

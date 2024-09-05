@@ -202,10 +202,10 @@ function CompetitorForm({
   onSubmit: (name: string, website: string, description: string) => void;
   initialValues?: { name: string; website: string; description: string };
 }) {
-  const [name, setName] = useState(initialValues?.name || "");
-  const [website, setWebsite] = useState(initialValues?.website || "");
+  const [name, setName] = useState(initialValues?.name ?? "");
+  const [website, setWebsite] = useState(initialValues?.website ?? "");
   const [description, setDescription] = useState(
-    initialValues?.description || "",
+    initialValues?.description ?? "",
   );
 
   const handleSubmit = () => {
