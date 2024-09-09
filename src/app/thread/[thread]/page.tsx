@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -6,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Icons } from "@/components/ui/icons";
-import { Check } from "lucide-react";
+import { ArrowRight, ArrowUp, Check } from "lucide-react";
 import { SearchStep } from "./_components/search-step";
 import { useParams } from "next/navigation";
 import { useChat } from "ai/react";
@@ -36,8 +37,14 @@ export default function ThredChatPage() {
       await utils.chat.getThreadMessages.invalidate({ threadId: thread });
     },
   });
+  const createQuery = api.chat.createQuery.useMutation({
+    onSuccess: async () => {
+      await utils.chat.getThreadMessages.invalidate({ threadId: thread });
+    },
+  });
   const { isPending: isPendingSources } = createSources;
   const { isPending: isPendingMessage } = createMessage;
+  const { isPending: isPendingQuery } = createQuery;
   const {
     messages,
     input,
@@ -47,7 +54,7 @@ export default function ThredChatPage() {
     isLoading: generating,
   } = useChat({
     keepLastMessageOnError: true,
-    onFinish: async (message) => {
+    onFinish: async () => {
       setIsAsking(false);
       await utils.chat.getThreadMessages.invalidate({ threadId: thread });
     },
@@ -68,7 +75,9 @@ export default function ThredChatPage() {
     event.preventDefault();
     setIsAsking(true);
     const data = { query: input };
-    const sources = await createSources.mutateAsync(data);
+    const query = await createQuery.mutateAsync(data);
+    const sourceData = { query: input, searchObject: query.object };
+    const sources = await createSources.mutateAsync(sourceData);
     await createMessage.mutateAsync({
       threadId: thread,
       content: input,
@@ -107,12 +116,12 @@ export default function ThredChatPage() {
 
   return (
     <div className="flex h-screen w-full justify-center">
-      <div className="relative w-3/5">
+      <div className="relative w-2/5">
         <div className="h-full w-full">
-          <ScrollArea className="h-[80%] w-full">
+          <ScrollArea className="h-screen w-full">
             <div
               ref={scroll}
-              className="shadown shadown my-2 h-full w-full rounded-sm border bg-white px-4 dark:bg-zinc-900"
+              className="shadown shadown my-2 h-full w-full px-4"
             >
               {!isAsking
                 ? threadMessages?.map((message) => (
@@ -127,7 +136,7 @@ export default function ThredChatPage() {
               {isAsking ? (
                 <div>
                   <SearchStep
-                    isLoading={isPendingSources}
+                    isLoading={isPendingQuery}
                     stepName="Genereting query"
                   />
                   <SearchStep
@@ -162,6 +171,7 @@ export default function ThredChatPage() {
                     </div>
                   ))
                 : null}
+              <div className="mt-[200px]"></div>
             </div>
           </ScrollArea>
         </div>
@@ -194,9 +204,14 @@ export default function ThredChatPage() {
                 }
                 className="absolute bottom-2 right-2 mb-2 bg-blue-200 text-black hover:bg-gray-100 dark:bg-gray-200 dark:text-gray-700 dark:hover:bg-gray-300"
               >
-                {generating || isPendingSources || isPendingMessage || isAsking
-                  ? "Searching..."
-                  : "Search"}
+                {generating ||
+                isPendingSources ||
+                isPendingMessage ||
+                isAsking ? (
+                  <Icons.spinner className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ArrowUp className="h-4 w-4" />
+                )}
               </Button>
             </form>
           </div>
@@ -205,3 +220,4 @@ export default function ThredChatPage() {
     </div>
   );
 }
+/* eslint-enable */

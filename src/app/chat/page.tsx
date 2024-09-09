@@ -47,8 +47,11 @@ export default function ChatPage() {
           </Button>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4">
-          {exapleQuery.map((query) => (
-            <div className="cursor-pointer rounded-md border bg-slate-100 p-4 shadow hover:bg-gray-200 dark:bg-zinc-950 dark:hover:bg-zinc-900">
+          {exapleQuery.map((query, idx) => (
+            <div
+              key={idx}
+              className="cursor-pointer rounded-md border bg-slate-100 p-4 shadow hover:bg-gray-200 dark:bg-zinc-950 dark:hover:bg-zinc-900"
+            >
               <h2 className="text-sm">{query}</h2>
             </div>
           ))}

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { MoonIcon, NewspaperIcon, PlusIcon, SunIcon } from "lucide-react";
+import { MoonIcon, NewspaperIcon, PlusIcon, SunIcon, User } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -11,6 +11,17 @@ import {
 } from "@/components/ui/tooltip";
 import { ThreadList } from "./thread-list";
 import { useRouter } from "next/navigation";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, Settings } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 export function SidebarThred() {
   const { theme, setTheme } = useTheme();
@@ -24,7 +35,7 @@ export function SidebarThred() {
     <div className="flex h-full">
       <div className="flex h-full w-16 flex-col items-center justify-between space-y-4 border-r border-gray-200 py-4 dark:border-zinc-800">
         <div className="flex flex-col items-center space-y-4">
-          <div className="text-2xl font-bold">A</div>
+          <div className="text-2xl font-bold">F</div>
           <TooltipProvider>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
@@ -64,6 +75,33 @@ export function SidebarThred() {
           <Button variant="ghost" size="icon" onClick={changeTheme}>
             {theme === "light" ? <SunIcon /> : <MoonIcon />}
           </Button>
+          <div className="mt-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="cursor-pointer">
+                  <AvatarFallback>
+                    <User className="h-6 w-6" />
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="right">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
       {!isOpen ? (

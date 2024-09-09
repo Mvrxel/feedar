@@ -25,12 +25,12 @@ export function Message({ message }: { message: MessageWithSource }) {
     <div className="mt-8">
       {message.role === "USER" ? (
         <div>
-          <h1 className="text-2xl font-bold">{message.content}</h1>
+          <h1 className="mb-4 text-3xl font-bold">{message.content}</h1>
           <div className="my-4 grid grid-cols-4 gap-4">
             {message.Sources.map((source) => (
               <div
                 key={source.id}
-                className="mb-4 flex h-28 flex-col justify-between rounded-xl border p-4"
+                className="mb-4 flex h-28 flex-col justify-between rounded-xl border bg-gray-100 p-4 dark:bg-zinc-900"
               >
                 <span className="line-clamp-2 text-sm">{source.title}</span>
                 <Separator />
@@ -39,7 +39,7 @@ export function Message({ message }: { message: MessageWithSource }) {
                   href={source.url}
                   target="_blank"
                 >
-                  Website
+                  Read more
                 </Link>
               </div>
             ))}

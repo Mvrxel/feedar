@@ -5,4 +5,3 @@ export default function ThreadChatLayout({
 }) {
   return <div>{children}</div>;
 }
-``;

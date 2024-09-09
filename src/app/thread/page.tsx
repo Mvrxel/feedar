@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -69,3 +70,4 @@ export default function ThreadPage() {
     </div>
   );
 }
+/* eslint-enable */

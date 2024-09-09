@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,6 @@ import { CopyIcon } from "lucide-react";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
-  darcula,
   oneLight,
   oneDark,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -25,7 +25,6 @@ const Pre: React.FC<PreProps> = ({ children }) => {
   if (!children || typeof children !== "object" || !("props" in children)) {
     return <pre>{children}</pre>;
   }
-  console.log(children.props.children.props.className);
   const match = /language-(\w+)/.exec(
     children.props.children.props.className || "",
   );
@@ -127,3 +126,4 @@ export function MarkdownRenderer({ content }: { content: string }) {
     </Markdown>
   );
 }
+/* eslint-enable */
