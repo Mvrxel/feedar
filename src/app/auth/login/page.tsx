@@ -114,6 +114,17 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icons } from "@/components/ui/icons";
 import { useSearchParams } from "next/navigation";
 
+const whiteListedEmails = [
+  "marcel.bilski@anzuro.com",
+  "mvrxel@gmail.com",
+  "artur.sowa@anzuro.com",
+  "przemyslaw.pydo@anzuro.com",
+  "marcel.bilski@neofarm.eu",
+  "tomasz.bilski@neofarm.eu",
+  "marita.rak@neofarm.eu",
+  "ksiegowosc@neofarm.eu",
+];
+
 export default function SignInPage() {
   const { theme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -125,12 +136,17 @@ export default function SignInPage() {
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     setIsLoading(true);
-    try {
-      await signIn("email", { email });
-      setIsError(false);
-    } catch (error) {
-      console.error(error);
+    if (!whiteListedEmails.includes(email)) {
       setIsError(true);
+      return;
+    } else {
+      try {
+        await signIn("email", { email });
+        setIsError(false);
+      } catch (error) {
+        console.error(error);
+        setIsError(true);
+      }
     }
     setIsLoading(false);
   }
